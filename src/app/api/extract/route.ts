@@ -1,4 +1,4 @@
-import { aiErrorResponse, gemini, MODEL } from "@/lib/gemini";
+import { aiErrorResponse, generate, MODEL } from "@/lib/gemini";
 import { INVOICE_JSON_SCHEMA, InvoiceSchema, runChecks } from "@/lib/invoice";
 import { clientIp, limitResponse, rateLimit } from "@/lib/ratelimit";
 
@@ -29,8 +29,7 @@ export async function POST(req: Request) {
   try {
     const t0 = performance.now();
     const data = Buffer.from(await file.arrayBuffer()).toString("base64");
-    const res = await gemini().models.generateContent({
-      model: MODEL,
+    const res = await generate({
       contents: [{ role: "user", parts: [{ inlineData: { mimeType: file.type, data } }, { text: PROMPT }] }],
       config: { responseMimeType: "application/json", responseJsonSchema: INVOICE_JSON_SCHEMA, temperature: 0, maxOutputTokens: 4000 },
     });
